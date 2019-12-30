@@ -1,0 +1,34 @@
+#include "mainwindow.h"
+#include "validation.h"
+#include "tile.h"
+#include "EConn.h"
+
+#include <QApplication>
+#include <QLabel>
+#include <QDebug>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
+#include <netdb.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <iostream>
+
+using namespace std;
+
+#define PORT "3490"
+#define LOCAL "127.0.0.1"
+
+int main(int argc, char *argv[])
+{
+  QApplication a(argc, argv);
+  MainWindow w;
+  w.show();
+  //conn();
+  return a.exec();
+}

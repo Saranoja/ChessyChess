@@ -1,0 +1,32 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Images/bishop_black.svg</file>
+        <file>Images/bishop_white.svg</file>
+        <file>Images/king_black.svg</file>
+        <file>Images/king_white.svg</file>
+        <file>Images/knight_black.svg</file>
+        <file>Images/knight_white.svg</file>
+        <file>Images/pawn_black.svg</file>
+        <file>Images/pawn_white.svg</file>
+        <file>Images/queen_black.svg</file>
+        <file>Images/queen_white.svg</file>
+        <file>Images/rook_black.svg</file>
+        <file>Images/rook_white.svg</file>
+        <file>Images/profile.png</file>
+	<file>Images/custom.jpg</file>
+	<file>Images/leaderboard.jpg</file>
+	<file>Images/tournament.jpg</file>
+	<file>Images/IMG_0039.jpg</file>
+	<file>Images/IMG_0038.jpg</file>
+	<file>Images/piece.jpg</file>
+	<file>Images/tour.jpg</file>
+	<file>Images/play.jpg</file>
+	<file>Images/proceed.jpg</file>
+	<file>Images/profile1.jpg</file>
+	<file>Images/profile2.jpg</file>
+	<file>Images/pannel.jpg</file>
+	<file>Images/username.jpg</file>
+	<file>Images/waiting.jpg</file>
+	<file>Images/waiting.mp4</file>
+    </qresource>
+</RCC>
