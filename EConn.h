@@ -10,7 +10,7 @@ void *get_in_addr(struct sockaddr *sa);
 
 int conn();
 
-void player(int sd, int player_nr);
+int player(int sd, int player_nr);
 
 int move_signal(int sd);
 
@@ -20,13 +20,12 @@ void sendname(int sd, QString username);
 
 void getname(int sd, char opponentName[100]); //is supposed to get the name of the opponent and save it for the database etc.
 
-void signal_zero(int sd);
+void send_move(int sd, int *code);
 
-struct game_data
-{
-  char opponentName;
-  char date;
-  char result;
-};
+void get_move(int sd, int *opponentCode);
+
+void useless(int sd);
+
+void useless_char(int sd);
 
 #endif // ECONN_H
