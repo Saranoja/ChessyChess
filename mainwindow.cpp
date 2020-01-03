@@ -19,6 +19,7 @@
 int count=0,exp[60],max=0, turn=1; //white begins
 int wR,wC,bR,bC;
 Tile *click1;
+int sd;
 
 int player_nr;
 
@@ -139,7 +140,7 @@ void MainWindow::accessories(QWidget *baseWidget)
 {
   QLabel *player2 = new QLabel(baseWidget);
 
-  if(player_nr==1){
+  if(player_nr==0){
       QLabel *name2 = new QLabel(opponentName, baseWidget); //Player 2 -> username or
       QLabel *time2 = new QLabel("00:00:00", baseWidget);
 
@@ -167,7 +168,7 @@ void MainWindow::accessories(QWidget *baseWidget)
       moves->setPixmap(QPixmap(":/Images/pannel.jpg"));
     }
 
-  else
+  else if(player_nr==1)
     {
       QLabel *name2 = new QLabel(username, baseWidget); //Player 2 -> username or
       QLabel *time2 = new QLabel("00:00:00", baseWidget);
@@ -236,17 +237,17 @@ void MainWindow::on_pushButton_3_clicked() //on play page
   QLabel *image2= new QLabel(myWidget2);
   image2->setPixmap(QPixmap(":/Images/waiting.jpg")); //draw waiting screen
 
-  int sd=conn();
+  sd=conn();
 
-  player(sd, player_nr);
+  player_nr=player(sd, player_nr);
 
-  if(player_nr==2) {
+  if(player_nr==0) {
       myWidget2->show();
     }
 
-  signal_zero(sd);
   sendname(sd, username); //here starts the match
   getname(sd,opponentName);
+
   myWidget2->deleteLater();
   QWidget *myWidget = new QWidget();
   myWidget->setGeometry(0,0,1700,956);
