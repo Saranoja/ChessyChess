@@ -22,7 +22,7 @@
 
 using namespace std;
 
-#define PORT 2726
+#define PORT 3490
 #define LOCAL "127.0.0.1"
 
 int conn()
@@ -51,16 +51,10 @@ int conn()
   return sd;
 }
 
-void signal_zero(int sd)
-{
-  if (write(sd, "0", sizeof(char)) <= 0) {
-      perror("[client]Eroare la write() spre server.\n");
-    }
-}
-
-void player(int sd, int player_nr)
+int player(int sd, int player_nr)
 {
   read(sd, &player_nr, sizeof(player_nr));
+  return player_nr;
 }
 
 int move_signal(int sd)
@@ -79,35 +73,63 @@ void finish_move_signal(int sd)
 void sendname(int sd, QString username)
 {
   int nameLen=username.size();
+  if (write(sd, "0", sizeof(char)) <= 0)
+  {
+      perror("[client]Eroare la write() spre server.\n");
+  }
   if (write(sd, &nameLen, sizeof(int)) <= 0)
-         perror("[client]Eroare la write() spre server.\n");
+    perror("[client]Eroare la write() spre server.\n");
   std::string str=username.toStdString();
   const char* name = str.c_str();
   if (write(sd, name, nameLen) <= 0) {
       perror("[client]Eroare la write() spre server.\n");
-  }
-
-  /*char name[100]="John ";
-  int nameLen = strlen(name);
-  name[nameLen--] = '\0';
-  if (write(sd, &nameLen, sizeof(int)) <= 0) {
-      perror("[client]Eroare la write() spre server.\n");
     }
-  if (write(sd, name, nameLen) <= 0) {
-      perror("[client]Eroare la write() spre server.\n");
-    }
-  */
 }
 
 void getname(int sd, char opponentName[100])
 {
-  //printf("Buna ziua");
   int nameLen;
   bzero(opponentName, sizeof(opponentName));
   if (read(sd, &nameLen, sizeof(int) ) < 0) {
       perror("[client]Eroare la read() de la server.\n");
     }
   if (read(sd, opponentName, nameLen ) < 0) {
+      perror("[client]Eroare la read() de la server.\n");
+    }
+}
+
+void send_move(int sd, int *code)
+{
+  char c = '1';
+  if (write(sd, &c, sizeof(char)) <= 0)
+    {
+      perror("[client]Eroare la write() spre server.\n");
+    }
+  if (write(sd, code, sizeof(int)) <= 0) {
+      perror("[client]Eroare la write() spre server.\n");
+    }
+}
+
+void get_move(int sd, int *opponentCode)
+{
+  if (read(sd, opponentCode, sizeof(int) ) < 0) {
+      perror("[client]Eroare la read() de la server.\n");
+    }
+}
+
+void useless(int sd)
+{
+  int c;
+  if (read(sd, &c, sizeof(int) ) < 0) {
+      perror("[client]Eroare la read() de la server.\n");
+    }
+
+}
+
+void useless_char(int sd)
+{
+  char c;
+  if (read(sd, &c, sizeof(char) ) < 0) {
       perror("[client]Eroare la read() de la server.\n");
     }
 }
