@@ -20,23 +20,35 @@
 
 validation *valid = new validation();
 
-//int sockfd=conn();
+extern QWidget *myWidget;
+QWidget *layer;
+
 int x1,x2,y1,y2,code;
 extern int turn;
-//int player_number=player(sockfd);
-int do_move;
+extern int player_nr;
+extern int sd;
+
+int line, col, line_to, col_to;
+
+int opponentCode=0;
+
+int counter=0;
 
 extern int count;
-extern QWidget *myWidget;
 extern Tile *click1;
-extern Tile *tile[8][8];
+Tile *tester[8][8];
+
+Tile *change;
+Tile *replace;
+
+Tile *op_to, *op_from;
 
 void validate(Tile *temp,int c);
 void disOrange();
 
 void Tile::mousePressEvent(QMouseEvent *event)
 {
-    validate(this,++count);
+  validate(this,++count);
 }
 
 void Tile::display(char elem)
@@ -87,87 +99,244 @@ void Tile::display(char elem)
 
 void validate(Tile *temp, int c)
 {
-    int retValue,i;
+  int retValue,i;
 
-    if(c==1)
+  if(player_nr==0)
+    turn=1;
+  else
+    turn=0;
+
+  if(player_nr==0) //if i begin
     {
-        if(temp->piece && (temp->pieceColor==turn))
-        {
-            //exp[max++]=temp->tileNum;
-            retValue=valid->chooser(temp);
 
-            if(retValue)
+      if(c==1) //if it's the first click
+        {
+          if(temp->piece && (temp->pieceColor==turn)) //i click on a piece and it's my turn
             {
-                click1= new Tile();
-                temp->setStyleSheet("QLabel {background-color: green;}");
-                click1=temp;
+              //exp[max++]=temp->tileNum;
+              retValue=valid->chooser(temp);
+
+              if(retValue) //good click
+                {
+                  click1= new Tile();
+                  temp->setStyleSheet("QLabel {background-color: green;}");
+                  click1=temp;
+                }
+              else //bad click
+                {
+                  //temp->setStyleSheet("QLabel {background-color: red;}");
+                  count=0;
+                }
             }
-            else
+          else
             {
-                //temp->setStyleSheet("QLabel {background-color: red;}");
-                count=0;
+              //qDebug()<<"Rascel, clicking anywhere";
+              count=0;
             }
         }
-        else
+
+      else //second click
         {
-            //qDebug()<<"Rascel, clicking anywhere";
-            count=0;
+
+          if(temp->tileNum==click1->tileNum) //click on the same tile again
+            {
+              click1->tileDisplay();
+              disOrange();
+              max=0;
+              count=0;
+            }
+
+          for(i=0;i<max;i++)
+            {
+              if(temp->tileNum==exp[i]) //exchange the two tiles
+                {
+                  click1->piece=0;
+                  temp->piece=1;
+
+                  temp->pieceColor=click1->pieceColor;
+                  temp->pieceName=click1->pieceName;
+
+                  click1->display(click1->pieceName);
+                  temp->display(click1->pieceName);
+
+                  click1->tileDisplay();
+                  temp->tileDisplay();
+
+                  y1=click1->row;
+                  x1=click1->col;
+                  y2=temp->row;
+                  x2=temp->col;
+
+                  code=y1*1000+x1*100+y2*10+x2; //this is what i have to send to the server
+
+                  send_move(sd,&code);
+
+                  retValue=valid->check(click1);
+
+                  disOrange();
+
+                  max=0;
+
+                  count=0;
+
+                }
+
+              else
+                count=1;
+            }
+
+
+          get_move(sd,&opponentCode);
+
+          line=(opponentCode/1000)%10;
+          col=(opponentCode/100)%10;
+          line_to=(opponentCode/10)%10;
+          col_to=opponentCode%10;
+
+          char piece;
+          int colour;
+
+          if(opponentCode!=5) {
+
+              replace = new Tile();
+              replace=tile[line_to][col_to];
+              //change->tileColor=1;
+              replace->piece=1;
+              //change->pieceName='K';
+              piece=tile[line][col]->pieceName;
+              colour=tile[line][col]->pieceColor;
+              replace->pieceColor=colour;
+              replace->tileNum=25;
+              replace->display(piece);
+              replace->tileDisplay();
+
+
+              change = new Tile();
+              change=tile[line][col];
+              change->piece=0;
+              change->display('Q'); //irrelevant
+              change->tileDisplay();
+            }
+
         }
     }
 
-    else
+  else //if im the 2nd player
     {
 
-        if(temp->tileNum==click1->tileNum)
-        {
-            click1->tileDisplay();
-            disOrange();
-            max=0;
-            count=0;
+      get_move(sd,&opponentCode);
+      line=(opponentCode/1000)%10;
+      col=(opponentCode/100)%10;
+      line_to=(opponentCode/10)%10;
+      col_to=opponentCode%10;
+
+      char piece;
+      int colour;
+
+      if(opponentCode!=5) {
+
+          replace = new Tile();
+          replace=tile[line_to][col_to];
+          replace->piece=1;
+          piece=tile[line][col]->pieceName;
+          colour=tile[line][col]->pieceColor;
+          replace->pieceColor=colour;
+          replace->tileNum=25; //irrelevant
+          replace->display(piece);
+          replace->tileDisplay();
+
+
+          change = new Tile();
+          change=tile[line][col];
+          change->piece=0;
+          change->display('Q');
+          change->tileDisplay();
         }
 
-        for(i=0;i<max;i++)
+
+      if(c==1) //if it's the first click
         {
-            if(temp->tileNum==exp[i])
+          if(temp->piece && (temp->pieceColor==turn)) //i click on a piece and it's my turn
             {
-                click1->piece=0;
-                temp->piece=1;
+              //exp[max++]=temp->tileNum;
+              retValue=valid->chooser(temp);
 
-                temp->pieceColor=click1->pieceColor;
-                temp->pieceName=click1->pieceName;
-
-                click1->display(click1->pieceName);
-                temp->display(click1->pieceName);
-
-                click1->tileDisplay();
-                temp->tileDisplay();
-
-                y1=click1->row;
-                x1=click1->col;
-                y2=temp->row;
-                x2=temp->col;
-
-                code=y1*1000+x1*100+y2*10+x2; //this is what i have to send to the server
-
-                retValue=valid->check(click1);
-                /*
-                if(retValue)
+              if(retValue) //good click
                 {
-                    tile[wR][wC]->setStyleSheet("QLabel {background-color: red;}");
+                  click1= new Tile();
+                  temp->setStyleSheet("QLabel {background-color: green;}");
+                  click1=temp;
                 }
-                */
+              else //bad click
+                {
+                  //temp->setStyleSheet("QLabel {background-color: red;}");
+                  count=0;
+                }
+            }
+          else
+            {
+              //qDebug()<<"Rascel, clicking anywhere";
+              count=0;
+            }
+        }
 
-                disOrange();
+      else //second click
+        {
 
-                max=0;
-
-                turn=(turn+1)%2;
-                count=0;
+          if(temp->tileNum==click1->tileNum) //click on the same tile again
+            {
+              click1->tileDisplay();
+              disOrange();
+              max=0;
+              count=0;
             }
 
-            else
+          for(i=0;i<max;i++)
+            {
+              if(temp->tileNum==exp[i]) //exchange the two tiles
+                {
+                  click1->piece=0;
+                  temp->piece=1;
+
+                  temp->pieceColor=click1->pieceColor;
+                  temp->pieceName=click1->pieceName;
+
+                  click1->display(click1->pieceName);
+                  temp->display(click1->pieceName);
+
+                  click1->tileDisplay();
+                  temp->tileDisplay();
+
+                  y1=click1->row;
+                  x1=click1->col;
+                  y2=temp->row;
+                  x2=temp->col;
+
+                  code=y1*1000+x1*100+y2*10+x2; //this is what i have to send to the server
+
+                  send_move(sd,&code);
+
+                  retValue=valid->check(click1);
+
+                  disOrange();
+
+                  max=0;
+
+                  count=0;
+                }
+
+              else
                 count=1;
+            }
         }
+      //if(code)
+      //send_move(sd,&code);
+
+      //get_move(sd,&opponentCode);
+
+      //get_move(sd,&opponentCode);
+
+
     }
 }
 
