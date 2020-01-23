@@ -2,10 +2,13 @@
 #include "validation.h"
 #include "mainwindow.h"
 #include "EConn.h"
+#include "ui_mainwindow.h"
 
 #include <QTextEdit>
-#include <string.h>
+#include <QSqlDatabase>
+#include <QSqlQuery>
 
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -22,6 +25,10 @@ validation *valid = new validation();
 
 extern QWidget *myWidget;
 QWidget *layer;
+
+QString result;
+extern QString username;
+extern char opponentName[100];
 
 int x1,x2,y1,y2,code;
 extern int turn;
@@ -41,7 +48,8 @@ Tile *tester[8][8];
 Tile *change;
 Tile *replace;
 
-Tile *op_to, *op_from;
+QSqlQuery qry;
+
 
 void validate(Tile *temp,int c);
 void disOrange();
@@ -185,7 +193,6 @@ void validate(Tile *temp, int c)
                 count=1;
             }
 
-
           get_move(sd,&opponentCode);
 
           line=(opponentCode/1000)%10;
@@ -196,7 +203,7 @@ void validate(Tile *temp, int c)
           char piece;
           int colour;
 
-          if(opponentCode!=5) {
+          if(opponentCode!=5 && opponentCode!=2 && opponentCode!=3 &&opponentCode!=0) {
 
               replace = new Tile();
               replace=tile[line_to][col_to];
@@ -218,6 +225,36 @@ void validate(Tile *temp, int c)
               change->tileDisplay();
             }
 
+          if(opponentCode==2) //i won
+            {
+              QWidget *myWidget = new QWidget();
+              myWidget->setGeometry(0,0,1700,956);
+              QLabel *image= new QLabel(myWidget);
+              image->setPixmap(QPixmap(":/Images/won.jpg"));
+              result="w";
+              qry.exec("insert into history values ('" + username + "', date('now'),'" + opponentName + "','" + result + "');" );
+            }
+
+          if(opponentCode==3) //opponent won
+            {
+              QWidget *myWidget = new QWidget();
+              myWidget->setGeometry(0,0,1700,956);
+              QLabel *image= new QLabel(myWidget);
+              image->setPixmap(QPixmap(":/Images/lost.jpg"));
+              result="l";
+              qry.exec("insert into history values ('" + username + "', date('now'),'" + opponentName + "','" + result + "');" );
+            }
+
+          if(opponentCode==0) //opponent disconnected
+            {
+              QWidget *myWidget = new QWidget();
+              myWidget->setGeometry(0,0,1700,956);
+              QLabel *image= new QLabel(myWidget);
+              image->setPixmap(QPixmap(":/Images/disconnected.jpg"));
+              result="N/A";
+               qry.exec("insert into history values ('" + username + "', date('now'),'" + opponentName + "','" + result + "');" );
+            }
+
         }
     }
 
@@ -233,8 +270,9 @@ void validate(Tile *temp, int c)
       char piece;
       int colour;
 
-      if(opponentCode!=5) {
+      if(opponentCode!=5 && opponentCode!=2 && opponentCode!=3 &&opponentCode!=0)
 
+        {
           replace = new Tile();
           replace=tile[line_to][col_to];
           replace->piece=1;
@@ -252,6 +290,37 @@ void validate(Tile *temp, int c)
           change->display('Q');
           change->tileDisplay();
         }
+
+      if(opponentCode==2) //i won
+        {
+          QWidget *myWidget = new QWidget();
+          myWidget->setGeometry(0,0,1700,956);
+          QLabel *image= new QLabel(myWidget);
+          image->setPixmap(QPixmap(":/Images/lost.jpg"));
+          result="l";
+          qry.exec("insert into history values (" + username + ", date('now')," + opponentName + "," + result + ");" );
+        }
+
+      if(opponentCode==3) //opponent won
+        {
+          QWidget *myWidget = new QWidget();
+          myWidget->setGeometry(0,0,1700,956);
+          QLabel *image= new QLabel(myWidget);
+          image->setPixmap(QPixmap(":/Images/won.jpg"));
+          result="w";
+          qry.exec("insert into history values (" + username + ", date('now')," + opponentName + "," + result + ");" );
+        }
+
+      if(opponentCode==0) //opponent disconnected
+        {
+          QWidget *myWidget = new QWidget();
+          myWidget->setGeometry(0,0,1700,956);
+          QLabel *image= new QLabel(myWidget);
+          image->setPixmap(QPixmap(":/Images/disconnected.jpg"));
+          result="N/A";
+          qry.exec("insert into history values (" + username + ", date('now')," + opponentName + "," + result + ");" );
+        }
+
 
 
       if(c==1) //if it's the first click
@@ -329,12 +398,6 @@ void validate(Tile *temp, int c)
                 count=1;
             }
         }
-      //if(code)
-      //send_move(sd,&code);
-
-      //get_move(sd,&opponentCode);
-
-      //get_move(sd,&opponentCode);
 
 
     }
