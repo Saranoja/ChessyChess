@@ -23,7 +23,13 @@
 using namespace std;
 
 #define PORT 3490
+#define PORT2 3590
 #define LOCAL "127.0.0.1"
+
+struct leaderboard{         // structure for receiving database from server
+    char id[100];
+    int score;
+}myLB[100];
 
 int conn()
 {
@@ -41,6 +47,32 @@ int conn()
   server.sin_family = AF_INET;
   server.sin_addr.s_addr = inet_addr(LOCAL);
   server.sin_port = htons(PORT);
+
+  if (connect(sd, (struct sockaddr *)&server, sizeof(struct sockaddr)) == -1)
+    {
+      perror("[client]Eroare la connect().\n");
+      //return errno;
+    }
+
+  return sd;
+}
+
+int leaderboard_conn()
+{
+  int sd; // descriptorul de socket
+  struct sockaddr_in server; // structura folosita pentru conectare
+  // int code;
+
+  /* cream socketul */
+  if ((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+    {
+      perror("Eroare la socket().\n");
+      //return errno;
+    }
+
+  server.sin_family = AF_INET;
+  server.sin_addr.s_addr = inet_addr(LOCAL);
+  server.sin_port = htons(PORT2);
 
   if (connect(sd, (struct sockaddr *)&server, sizeof(struct sockaddr)) == -1)
     {
@@ -132,4 +164,11 @@ void useless_char(int sd)
   if (read(sd, &c, sizeof(char) ) < 0) {
       perror("[client]Eroare la read() de la server.\n");
     }
+}
+
+void receive_leaderboard(int sd)
+{
+  int LBSize;
+  read(sd, &LBSize, sizeof(int));  // get leaderboard in special struct myLB
+  read(sd, &myLB, sizeof(myLB));
 }
