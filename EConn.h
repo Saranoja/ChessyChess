@@ -10,6 +10,8 @@ void *get_in_addr(struct sockaddr *sa);
 
 int conn();
 
+int leaderboard_conn();
+
 int player(int sd, int player_nr);
 
 int move_signal(int sd);
@@ -27,5 +29,7 @@ void get_move(int sd, int *opponentCode);
 void useless(int sd);
 
 void useless_char(int sd);
+
+void receive_leaderboard(int sd);
 
 #endif // ECONN_H
