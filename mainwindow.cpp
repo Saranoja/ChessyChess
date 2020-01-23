@@ -25,11 +25,17 @@ int player_nr;
 
 char opponentName[100];
 
-extern QWidget *myWidget;
+QWidget *myWidget;
 
 QString username;
 
 Tile *tile[8][8] = { { NULL } };
+
+extern struct leaderboard{         // structure for receiving database from server
+  char id[100];
+  int score;
+}myLB[100];
+
 
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent)
@@ -142,25 +148,25 @@ void MainWindow::accessories(QWidget *baseWidget)
 
   if(player_nr==0){
       QLabel *name2 = new QLabel(opponentName, baseWidget); //Player 2 -> username or
-      QLabel *time2 = new QLabel("00:00:00", baseWidget);
+      //QLabel *time2 = new QLabel("00:00:00", baseWidget);
 
       QLabel *player1 = new QLabel(baseWidget);
       QLabel *name1 = new QLabel(username, baseWidget); //Player 1 -> username depending on which player i am
-      QLabel *time1 = new QLabel("00:00:00", baseWidget);
+      //QLabel *time1 = new QLabel("00:00:00", baseWidget);
 
       QLabel *moves = new QLabel(baseWidget);
 
       name1->setGeometry(1425,730,80,20);
       name1->setStyleSheet("QLabel {color: white;}");
-      time1->setGeometry(1420,750,80,20);
-      time1->setStyleSheet("QLabel {color: white;}");
+      //time1->setGeometry(1420,750,80,20);
+      //time1->setStyleSheet("QLabel {color: white;}");
       player1->setGeometry(1400,630,100,100);
       player1->setPixmap(QPixmap(":/Images/profile1.jpg"));
 
       name2->setGeometry(1425,330,80,20);
       name2->setStyleSheet("QLabel {color: white;}");
-      time2->setGeometry(1420,350,80,20);
-      time2->setStyleSheet("QLabel {color: white;}");
+      //time2->setGeometry(1420,350,80,20);
+      //time2->setStyleSheet("QLabel {color: white;}");
       player2->setGeometry(1400,230,100,100);
       player2->setPixmap(QPixmap(":/Images/profile2.jpg"));
 
@@ -171,25 +177,25 @@ void MainWindow::accessories(QWidget *baseWidget)
   else if(player_nr==1)
     {
       QLabel *name2 = new QLabel(username, baseWidget); //Player 2 -> username or
-      QLabel *time2 = new QLabel("00:00:00", baseWidget);
+      //QLabel *time2 = new QLabel("00:00:00", baseWidget);
 
       QLabel *player1 = new QLabel(baseWidget);
       QLabel *name1 = new QLabel(opponentName, baseWidget); //Player 1 -> username depending on which player i am
-      QLabel *time1 = new QLabel("00:00:00", baseWidget);
+      //QLabel *time1 = new QLabel("00:00:00", baseWidget);
 
       QLabel *moves = new QLabel(baseWidget);
 
       name1->setGeometry(1425,730,80,20);
       name1->setStyleSheet("QLabel {color: white;}");
-      time1->setGeometry(1420,750,80,20);
-      time1->setStyleSheet("QLabel {color: white;}");
+      //time1->setGeometry(1420,750,80,20);
+      //time1->setStyleSheet("QLabel {color: white;}");
       player1->setGeometry(1400,630,100,100);
       player1->setPixmap(QPixmap(":/Images/profile1.jpg"));
 
       name2->setGeometry(1425,330,80,20);
       name2->setStyleSheet("QLabel {color: white;}");
-      time2->setGeometry(1420,350,80,20);
-      time2->setStyleSheet("QLabel {color: white;}");
+      //time2->setGeometry(1420,350,80,20);
+      //time2->setStyleSheet("QLabel {color: white;}");
       player2->setGeometry(1400,230,100,100);
       player2->setPixmap(QPixmap(":/Images/profile2.jpg"));
 
@@ -215,6 +221,35 @@ void MainWindow::on_pushButton_2_clicked() //on leaderboard page
   ui->page_4->hide();
   ui->page_5->show();
   SLOT(clear());
+
+  ui->tableWidget_2->setRowCount(0);
+  ui->tableWidget_2->setColumnCount(2);
+  ui->tableWidget_2->setColumnWidth(0,400);
+  ui->tableWidget_2->setColumnWidth(1,400);
+  ui->tableWidget_2->setHorizontalHeaderItem(0,new QTableWidgetItem("Username"));
+  ui->tableWidget_2->setHorizontalHeaderItem(1,new QTableWidgetItem("Score"));
+
+  QString name[10];
+  QString score[10];
+  int i=0;
+
+  name[0]="Johnny";
+  score[0]="22";
+  name[1]="Bot45A";
+  score[1]="20";
+  name[2]="Sandy666";
+  score[2]="12";
+  name[3]="Andrew";
+  score[3]="10";
+  name[4]="Saranoja";
+  score[4]="2";
+
+  for(i=0;i<=4;i++)
+    {
+      ui->tableWidget_2->insertRow(i);
+      ui->tableWidget_2->setItem(i,0,new QTableWidgetItem(name[i]));
+      ui->tableWidget_2->setItem(i,1,new QTableWidgetItem(score[i]));
+    }
 }
 
 void MainWindow::on_pushButton_3_clicked() //on play page
@@ -265,8 +300,6 @@ void MainWindow::on_pushButton_4_clicked() //on history page
   //ui->page_4->hide();
   ui->page_4->show();
   SLOT(clear());
-  //QTableView *view = new QTableView;
-  //view->show();
 
   int count=0;
 
@@ -326,7 +359,6 @@ void MainWindow::on_pushButton_8_clicked()
 
 void MainWindow::on_lineEdit_returnPressed()
 {
-  //ui->page->deleteLater();
   ui->page_7->deleteLater();
   ui->page_2->show();
   SLOT(clear());
@@ -337,9 +369,4 @@ void MainWindow::on_lineEdit_returnPressed()
 void MainWindow::on_label_linkActivated(const QString &link)
 {
   ui->label->setText(username);
-}
-
-void MainWindow::on_label_3_linkActivated(const QString &link)
-{
-
 }
